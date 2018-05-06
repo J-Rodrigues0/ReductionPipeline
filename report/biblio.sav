@@ -1,0 +1,16 @@
+% Encoding: UTF-8
+
+@Article{,
+  author  = {J. Canny},
+  title   = {A Computational Approach to Edge Detection},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year    = {1986},
+  volume  = {PAMI-8},
+  number  = {6},
+  pages   = {679-698},
+  month   = {Nov},
+  issn    = {0162-8828},
+  doi     = {10.1109/TPAMI.1986.4767851},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

@@ -86,7 +86,7 @@ target_indx = canny_detect(images_f[0],R[0],sigma,t,T)
 index = np.arange(0,nx,1)
 x_i, y_i = np.meshgrid(index,index)
 
-r_min = 25 # Determined empirically
+r_bkg = 25 # Determined empirically
 
 background_mode = np.zeros(nimage)
 background_avg = np.zeros(nimage)
@@ -97,19 +97,15 @@ for i in range(nimage):
 
 	r_i = np.sqrt((x_i-R[i][0])**2 + (y_i-R[i][1])**2)
 
-	hist, bins = np.histogram(img[(r_i > r_min)],bins=1000)
+	hist, bins = np.histogram(img[(r_i > r_bkg)],bins=1000)
 
 	background_mode[i] = np.min(bins[np.where(hist == np.max(hist))])
+	background_avg[i] = np.average(img[(r_i > r_bkg)])
 	
-	img -= background_mode[i]
+	#img -= background_mode[i]
+	img -= background_avg[i]
 
 	N_counts[i] = np.sum(img[target_indx[0] - 100 + R[i][1],target_indx[1] - 100 + R[i][0]])
-"""
-	img[target_indx[0] - 100 + R[i][1],target_indx[1] - 100 + R[i][0]] = 100000
-
-	plt.figure(12312)
-	plt.imshow(img)
-	plt.pause(0.1)"""
 
 Flux = N_counts
 

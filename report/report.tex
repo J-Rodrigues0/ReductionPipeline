@@ -140,8 +140,71 @@ As can be seen in Fig. \ref{fig:img_0_canny}, the algorithm seems to be a good c
 \label{fig:img_0_canny}
 \end{figure}
 
+\section{Background Estimation}
 
+In order to obtain an accurate result for the photometry, it is essencial that we account for the background counts present in the whole image. This value has to be estimated and subtracted from the image.
 
+Firstly, since the image contains other light sources as seen above, the mode of the image should represent better the value of the background as opposed to the mean which should have a contribution from these other sources. Besides that, the target should not be considered in the calculation of the background and thus only points outside a square of side $r_{bkg}$ will be taken into account.
+
+By calculating the mode for each of the images, we can see that it has an approximately sinusoidal variation (see Fig. \ref{fig:mode}) which can be fitted. The fit parameters and respective one standard deviation error are shown in Tab. \ref{tab:mode}.
+
+\begin{table}
+\caption{Mode sin fit parameters.}
+\label{tab:mode}
+\centering
+\begin{tabular}{c c c}
+\hline
+\noalign{\smallskip}
+Parameter & Value & $1\ \sigma$ \ error \\
+\hline
+\noalign{\smallskip}
+	A & $8.14\ \mathrm{e}{+0}$      & $2.98\ \mathrm{e}{-1}$ \\
+	f & $1.03\ \mathrm{e}{-2}$      & $4.64\ \mathrm{e}{-5}$ \\
+	$\phi$ & $4.97\ \mathrm{e}{+1}$ & $6.89\ \mathrm{e}{-2}$ \\
+	DC & $6.01\ \mathrm{e}{+1}$     & $2.07\ \mathrm{e}{-1}$
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+
+\includegraphics[width=.4\textwidth]{background_mode.png}
+
+\caption{Background mode throughout the images.}
+\label{fig:mode}
+\end{figure}
+
+From the sinusoidal fit, we can estimate the period of the mode oscillation to be $1/f = 97.03\ images$ which approximately corresponds to the period of rotation of the satellite, 100 minutes (since the integration time of the instrument is $1\ min$).
+
+On the other hand, the mean of the background can also be calculated in order to account for random oscillations in the image, which are not, in general, captured by the mode. As can be seen in Fig. \ref{tab:mean}, the mean detects the passage of the telescope through the South Atlantic Anomaly, caracterized by random peaks of noise around images $90$ and $350$.
+
+The same sinusoidal fit can be calculated for this data, using images in the range $[100-340]$. Tab. \ref{tab:mean} shows the parameters obtained in this calculation. The period of the sine wave is now $1/f = 97.43$ which is in close agreement with the result obtained from the mode.
+
+\begin{table}
+\caption{Mean sin fit parameters.}
+\label{tab:mean}
+\centering
+\begin{tabular}{c c c}
+\hline
+\noalign{\smallskip}
+Parameter & Value & $1\ \sigma$ \ error \\
+\hline
+\noalign{\smallskip}
+	A & $8.78\ \mathrm{e}{+0}$      & $2.30\ \mathrm{e}{-1}$ \\
+	f & $1.02\ \mathrm{e}{-2}$      & $6.03\ \mathrm{e}{-5}$ \\
+	$\phi$ & $4.96\ \mathrm{e}{+1}$ & $8.47\ \mathrm{e}{-2}$ \\
+	DC & $8.94\ \mathrm{e}{+1}$     & $1.64\ \mathrm{e}{-1}$
+\end{tabular}
+\end{table}
+
+\begin{figure}
+\centering
+
+\includegraphics[width=.4\textwidth]{background_avg.png}
+
+\caption{Background average throughout the images.}
+\label{fig:mean}
+\end{figure}
 
 \section{Photometry}
 

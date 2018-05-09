@@ -7,7 +7,7 @@ t0 = clock()
 
 ######### Opening images #########
 
-hdulist = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
+hdulist = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
 
 # Header
 header_subarray = hdulist[1].header
@@ -32,7 +32,7 @@ for i in range(nimage):
 
 ######### Flat Field #########
 
-hdulist_ff = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits")
+hdulist_ff = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits")
 
 # Determining Flat Field subarray with the Object
 ff = hdulist_ff[1].data
@@ -75,15 +75,11 @@ for i in range(nimage):
 
 from canny_edge_detection import canny_detect
 
-sigma = 0.6 # Determined empirically
-T = 10000 # Determined empirically
+sigma = 1.1 # Determined empirically
+T = 4000 # Determined empirically
 t = T*0.3 # Determined empirically
 
 target_indx = canny_detect(images_f[0],R[0],sigma,t,T)
-"""for i in range(1,nimage):
-	canny_indx = canny_detect(images_filt[i],R[i],sigma,t,T) # Indexes of the target's area
-	if canny_indx.size > target_indx.size:
-		target_indx = canny_indx"""
 
 ######### Photometry #########
 
@@ -115,13 +111,15 @@ for i in range(nimage):
 	plt.imshow(img)
 	plt.pause(0.1)"""
 
-Flux = N_counts/target_indx.size
+Flux = N_counts
 
 print('Total time elapsed: %s' %(clock() - t0))
 
+img_pts = np.arange(0,nimage,1)
+
 plt.figure(1)
-plt.scatter(np.arange(0,nimage,1),Flux,color='k')
-plt.ylabel('Flux (Number of Counts/Number of pixels)')
+plt.scatter(img_pts,Flux,color='k',marker='.')
+plt.ylabel('Flux (Number of Counts)')
 plt.xlabel('n')
 plt.show()
 

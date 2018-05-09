@@ -7,7 +7,7 @@ t0 = clock()
 
 ######### Opening images #########
 
-hdulist = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
+hdulist = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
 
 # Header
 header_subarray = hdulist[1].header
@@ -32,7 +32,7 @@ for i in range(nimage):
 
 ######### Flat Field #########
 
-hdulist_ff = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits")
+hdulist_ff = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits")
 
 # Determining Flat Field subarray with the Object
 ff = hdulist_ff[1].data
@@ -76,7 +76,7 @@ for i in range(nimage):
 from canny_edge_detection import canny_detect
 
 sigma = 0.6 # Determined empirically
-T = 4000 # Determined empirically
+T = 10000 # Determined empirically
 t = T*0.3 # Determined empirically
 
 img = np.zeros(images.shape) # Filtered image
@@ -89,9 +89,9 @@ for i in range(nimage):
 
 plt.figure(1)
 plt.imshow(images_f[0],cmap='gray')
-plt.imsave('Report/figs/img_0.png',arr = images_f[0],cmap = 'gray')
+#plt.imsave('../report/figs/img_0.png',arr = images_f[0],cmap = 'gray')
 
 plt.figure(2)
 plt.imshow(img[0],cmap='gray')
-plt.imsave('Report/figs/img_0_canny.png',arr = img[0],cmap = 'gray')
+#plt.imsave('../report/figs/img_0_canny.png',arr = img[0],cmap = 'gray')
 plt.show()

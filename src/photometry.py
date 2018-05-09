@@ -7,7 +7,7 @@ t0 = clock()
 
 ######### Opening images #########
 
-hdulist = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
+hdulist = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
 
 # Header
 header_subarray = hdulist[1].header
@@ -26,13 +26,13 @@ overscanleft = hdulist[7].data
 
 # Applying Overscan to Images (Average over all points of the overscan)
 
-images_b = np.zeros(images.shape) # Images without BIAS # IF USING ZEROS_LIKE, STRANGE BUG
+images_b = np.zeros(images.shape) # Images without BIAS
 for i in range(nimage):
 	images_b[i] = images[i] - np.average(overscanleft[i])
 
 ######### Flat Field #########
 
-hdulist_ff = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits")
+hdulist_ff = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits")
 
 # Determining Flat Field subarray with the Object
 ff = hdulist_ff[1].data
@@ -75,8 +75,8 @@ for i in range(nimage):
 
 from canny_edge_detection import canny_detect
 
-sigma = 0.6
-T = 4000
+sigma = 1.1
+T = 3500
 t = T*0.3
 
 target_indx = canny_detect(images_filt[0],R[0],sigma,t,T) # Indexes of the target's area
@@ -100,42 +100,58 @@ for i in range(nimage):
 	hist, bins = np.histogram(img[(r_i > r_min)],bins=1000)
 
 	background_mode[i] = np.min(bins[np.where(hist == np.max(hist))])
+
+	background_avg[i] = np.average(img[(r_i > r_min)])
 	
 	img -= background_mode[i]
+	#img -= background_avg[i]
 
 	N_counts[i] = np.sum(img[target_indx[0] - 100 + R[i][1],target_indx[1] - 100 + R[i][0]])
 
 print(clock()-t0)
 
-Flux = N_counts/target_indx.size
+Flux = N_counts
+
+img_pts = np.arange(0,nimage,1)
 
 plt.figure(1)
-plt.plot(Flux,color='k')
-plt.ylabel('Flux (Number of Counts/Number of pixels)')
+plt.scatter(img_pts,Flux,color='k',marker='.')
+plt.ylabel('Flux (Number of Counts)')
 plt.xlabel('n')
 
 plt.figure(2)
-plt.plot(background_mode,color='k')
+plt.scatter(img_pts,background_mode,color='k',marker='.')
 plt.ylabel('Background Mode')
 plt.xlabel('n')
 
 plt.figure(3)
-plt.plot(background_avg,color='k')
+plt.scatter(img_pts,background_avg,color='k',marker='.')
 plt.ylabel('Background Average')
 plt.xlabel('n')
 
+plt.show()
+
+"""
 # Calculate dispersion
 dispersion = abs((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
 plt.figure(4)
-plt.plot(dispersion,color='k')
-plt.ylabel('Dispersion (\% of max(Flux) - min(Flux))')
+plt.scatter(img_pts,dispersion,color='k',marker='.')
+plt.ylabel('Dispersion (%) (% of max(Flux) - min(Flux))')
 plt.xlabel('n')
+"""
+# Calculate standard deviation
+
+N = 50
+std_dev = np.std(Flux[:N])/np.mean(Flux[:N])*100
+
+print('Standard deviation of first %s points is: %s' %(N,round(std_dev,3)) + '%')
 
 ##### Optimization #####
-"""
-T_vals = np.arange(1000,10000,200)
+
+T_vals = np.arange(1000,20000,400)
 #T_vals = np.arange(2000,6000,50) # MINIMO DE DISPERSAO PARA T ~= 3500
 dispersion = np.zeros(len(T_vals))
+max_Flux = np.zeros(len(T_vals))
 for k in range(len(T_vals)):
 	T = T_vals[k]
 	print(T)
@@ -191,15 +207,23 @@ for k in range(len(T_vals)):
 	Flux = N_counts/target_indx.size
 
 	# Calculate dispersion
-	dispersion[k] = np.max((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
+	dispersion[k] = np.std(Flux[:N])/np.mean(Flux[:N])*100
+	max_Flux[k] = np.average(Flux)
 
 plt.figure(5)
 plt.plot(T_vals,dispersion,color='k')
-plt.ylabel('Dispersion (\% of max(Flux) - min(Flux))')
+plt.ylabel('Dispersion (%)')
 plt.xlabel('Higher Threshold values')
-plt.xticks(np.arange(1000,11000,1000))
+plt.xticks(np.arange(1000,21000,2000))
 
-S_vals = np.arange(0.1,1,0.05) # MINIMO DE DISPERSÃO PARA 0.5 SIGMA\
+plt.figure(1213)
+plt.plot(T_vals,max_Flux,color='k')
+plt.ylabel('Average of Flux')
+plt.xlabel('Higher Threshold values')
+plt.xticks(np.arange(1000,21000,2000))
+
+
+S_vals = np.arange(0.1,2.,0.05) # MINIMO DE DISPERSÃO PARA 0.5 SIGMA\
 dispersion = np.zeros(len(S_vals))
 for k in range(len(S_vals)):
 	sigma = S_vals[k]
@@ -256,18 +280,18 @@ for k in range(len(S_vals)):
 	Flux = N_counts/target_indx.size
 
 	# Calculate dispersion
-	dispersion[k] = np.max((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
+	dispersion[k] = np.std(Flux[:N])/np.mean(Flux[:N])*100
 
 plt.figure(6)
 plt.plot(S_vals,dispersion,color='k')
-plt.ylabel('Dispersion (\% of max(Flux) - min(Flux))')
+plt.ylabel('Dispersion (%)')
 plt.xlabel('Sigma values')
-plt.xticks(np.arange(0.1,1.1,0.1))
+plt.xticks(np.arange(0.1,2.1,0.1))
 
 
 T = 4000
 
-t_vals = np.arange(0.1,1,0.05) # MINIMO DE DISPERSÃO PARA 0.5 SIGMA\
+t_vals = np.arange(0.1,1,0.5) # MINIMO DE DISPERSÃO PARA 0.5 SIGMA\
 dispersion = np.zeros(len(t_vals))
 for k in range(len(t_vals)):
 	sigma = S_vals[k]
@@ -324,13 +348,13 @@ for k in range(len(t_vals)):
 	Flux = N_counts/target_indx.size
 
 	# Calculate dispersion
-	dispersion[k] = np.max((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
+	dispersion[k] = np.std(Flux[:N])/np.mean(Flux[:N])*100
 
 plt.figure(7)
 plt.plot(t_vals,dispersion,color='k')
-plt.ylabel('Dispersion (\% of max(Flux) - min(Flux))')
+plt.ylabel('Dispersion (%)')
 plt.xlabel('Lower Threshold values (fraction of Higher Threshold)')
-plt.xticks(np.arange(0.1,1.1,0.1))
+plt.xticks(np.arange(0.1,1.1,0.25))
 """
 """
 r_CM_vals = np.arange(10,80,5)
@@ -392,11 +416,11 @@ for k in range(len(r_CM_vals)):
 	Flux = N_counts/target_indx.size
 
 	# Calculate dispersion
-	dispersion[k] = np.max((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
+	dispersion[k] = np.std(Flux[:N])/np.mean(Flux[:N])*100
 
 plt.figure(8)
 plt.plot(r_CM_vals,dispersion,color='k')
-plt.ylabel('Dispersion (\% of max(Flux) - min(Flux))')
+plt.ylabel('Dispersion (%)')
 plt.xlabel('Square side used for CM calculation')
 plt.xticks(np.arange(10,80,10))
 
@@ -460,12 +484,12 @@ for k in range(len(r_min_vals)):
 	Flux = N_counts/target_indx.size
 
 	# Calculate dispersion
-	dispersion[k] = np.max((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
+	dispersion[k] = np.std(Flux[:N])/np.mean(Flux[:N])*100
 
 plt.figure(9)
 plt.plot(r_CM_vals,dispersion,color='k')
-plt.ylabel('Dispersion (\% of max(Flux) - min(Flux))')
+plt.ylabel('Dispersion (%)')
 plt.xlabel('Radius used for Background calculation')
 plt.xticks(np.arange(10,80,10))
-"""
+
 plt.show()

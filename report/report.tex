@@ -128,7 +128,7 @@ Even though this is the standard procedure to perform the canny edge algorithm, 
 
 The same principle (used in the calculation of the center of mass) of applying the algorithm to a box centered on the image was utilized here in order to find only the edges of the target. As such, this algorithm, if correctly applied - using optimized parameters of filter $\sigma$ and double thresholds, discussed in Sec. \ref{sec:param_opt} - should return the area of the target in a specific image.
 
-As can be seen in Fig. \ref{fig:img_0_canny}, the algorithm seems to be a good candidate for detecting the target's area, for as much as can be seen with the naked eye. This figure was obtained with $\sigma = 0.6$, higher threshold, $T = 4000$ and lower threshold, $t = 0.3T$.
+As can be seen in Fig. \ref{fig:img_0_canny}, the algorithm seems to be a good candidate for detecting the target's area, for as much as can be seen with the naked eye. This figure was obtained with $\sigma = 0.6$, higher threshold $T = 4000$ and lower threshold $t = 0.3T$.
 
 \begin{figure}
 \centering
@@ -139,6 +139,8 @@ As can be seen in Fig. \ref{fig:img_0_canny}, the algorithm seems to be a good c
 \caption{Comparison of image 0 target with detected area.}
 \label{fig:img_0_canny}
 \end{figure}
+
+
 
 
 \section{Photometry}

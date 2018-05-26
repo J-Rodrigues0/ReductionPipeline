@@ -99,10 +99,10 @@ for i in range(nimage):
 
 	hist, bins = np.histogram(img[(r_i > r_min)],bins=1000)
 
-	background_mode[i] = np.min(bins[np.where(hist == np.max(hist))])
-	background_avg[i] = np.average(img[(r_i > r_min)])
+	#background_mode[i] = np.min(bins[np.where(hist == np.max(hist))])
+	#background_avg[i] = np.average(img[(r_i > r_min)])
 	
-	#img -= background_mode[i]
+	img -= background_mode[i]
 	img -= background_avg[i]
 
 	N_counts[i] = np.sum(img[target_indx[0] - 100 + R[i][1],target_indx[1] - 100 + R[i][0]])
@@ -140,7 +140,7 @@ plt.xlabel('n')
 """
 # Calculate standard deviation
 
-N = 125
+N = 50
 std_dev = np.std(Flux[:N])/np.mean(Flux[:N])*100
 
 print('Standard deviation of first %s points is: %s' %(N,round(std_dev,3)) + '%')

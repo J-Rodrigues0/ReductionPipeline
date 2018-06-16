@@ -8,6 +8,8 @@
 
 \usepackage{amsmath}
 
+\usepackage{float}
+
 \graphicspath{{./figs/}}
 
 \usepackage{verbatim}
@@ -56,14 +58,14 @@
 
 The first step in treating the data is to subtract the overscan values from the image in order to remove the so-called Bias - a systematic error such as electronic noise introduced while reading the CCD .
 
-Since each image is provided with four extra columns of overscan wich contain no data appart from the reading noise, we can use these columns to compute the overscan. By performing an average over each line of the columns and computing the histogram of these average values, we can approximate the noise with a gaussian curve (see Fig. \ref{fig:overscan_hist}). The fit was optimized using the least squares method and the final parameters are $[A, \mu , \sigma] = [9.23, 5260.86, 7.07]$ with one standard deviation errors of $[0.515, 0.455, 0.457]$ respectively.
-
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=.4\textwidth]{overscan_hist.png}
 \caption{Histogram of averages for each line of the 4 columns.}
 \label{fig:overscan_hist}
 \end{figure}
+
+Since each image is provided with four extra columns of overscan wich contain no data appart from the reading noise, we can use these columns to compute the overscan. By performing an average over each line of the columns and computing the histogram of these average values, we can approximate the noise with a gaussian curve (see Fig. \ref{fig:overscan_hist}). The fit was optimized using the least squares method and the final parameters are $[A, \mu , \sigma] = [9.23, 5260.86, 7.07]$ with one standard deviation errors of $[0.515, 0.455, 0.457]$ respectively.
 
 This allows us to perform an average over all of the four columns and subtract that value from the image data, without introducing significant error.
 
@@ -178,7 +180,7 @@ From the sinusoidal fit, we can estimate the period of the mode oscillation to b
 
 On the other hand, the mean of the background can also be calculated in order to account for random oscillations in the image, which are not, in general, captured by the mode. As can be seen in Fig. \ref{tab:mean}, the mean detects the passage of the telescope through the South Atlantic Anomaly, caracterized by random peaks of noise around images $90$ and $350$.
 
-The same sinusoidal fit can be calculated for this data, using images in the range $[100-340]$. Tab. \ref{tab:mean} shows the parameters obtained in this calculation. The period of the sine wave is now $1/f = 97.43$ which is in close agreement with the result obtained from the mode.
+The same sinusoidal fit can be calculated for the mean data, using images in the range $[100-340]$. Tab. \ref{tab:mean} shows the parameters obtained in this calculation. The period of the sine wave is now $1/f = 97.43$ which is in close agreement with the result obtained from the mode.
 
 \begin{table}
 \caption{Mean sin fit parameters.}
@@ -208,10 +210,112 @@ Parameter & Value & $1\ \sigma$ \ error \\
 
 \section{Photometry}
 
+The photometry measurement can then be performed, by subtracting the background mode and, optionally, mean from the images and then sum the values of the points belonging to the target. The results obtained for the flux over time are shown in Fig. \ref{fig:flux}.
+
+\begin{figure}
+\centering
+\includegraphics[width=.4\textwidth]{flux.png}
+\includegraphics[width=.4\textwidth]{flux_no_avg.png}
+\caption{Flux of the target over time. Top: with background mode subtraction; Bottom: both mode and mean subtraction.}
+\label{fig:flux}
+\end{figure}
+
+The results clearly show a transit happening around the target start by the proeminent well in the flux data. We can also see the effect of the South Atlantic Anomaly on the flux, which raises it as found in the background mean data. By subtracting this mean from the data we can see that this effect is greatly reduced. However, by computing the dispersion,
+
+\begin{equation}
+\Delta F = \frac{\sigma_F}{\langle F\rangle}
+\end{equation}
+
+of the data in images $[0-60]$ and $[260 - 320]$, we can see that this mean subtraction introduces dispersion in the data.
+
+This dispersion can be used as a figure of merit for the effectiveness of the algorithm. We would ideally want $\lesssim 20$ ppm dispersion in 6 hours of observation to fulfill the CHEOPS mission requirements \cite{cheops}. Since in this case the observation is not that long, we can only estimate the dispersion of the algorithm by computing,
+
+\begin{equation}
+\Delta F_{6h} = \frac{\Delta F}{\sqrt{6*60}}
+\end{equation}
+
+since $\Delta F$ is for a single minute of observation. By observing Tab. \ref{tab:dispersion}, we can see that the results are similar to those expected, being smaller that 20 when only subtracting the mode and being less than 1 ppm higher than 20 when subtracting the mean.
+
+\begin{table}[]
+\centering
+\caption{Estimation of the dispersion for 6 hours of observation using the developed method.}
+\label{tab:dispersion}
+\begin{tabular}{lcccc}
+\multicolumn{1}{c}{}                                          & \multicolumn{2}{c}{Mode}       & \multicolumn{2}{c}{Mode + Mean} \\
+Images                                                        & {[}0 - 60{]} & {[}260 - 320{]} & {[}0 - 60{]}  & {[}260 - 320{]} \\
+\begin{tabular}[c]{@{}l@{}}Dispersion 6h\\ (ppm)\end{tabular} & 15.894       & 19.752          & 20.957        & 20.543         
+\end{tabular}
+\end{table}
+
 \section{Parameter Optimization} \label{sec:param_opt}
+
+The results in Fig. \ref{fig:flux} were obtained by optimizing the algorithm's parameters in regards to minimizing the dispersion as will be explained in the current section.
+
+We started by optimizing the size of the square for the center of mass computation by setting all other parameters to mere approximations of their optimal value. We can conclude that any value between 20 and 40 would be optimal. We thus chose 20 as the optimal value in order to minimize the number of points used in the calculation and improve computation efficiency.
+
+We proceeded to optimizing the radius of the background calculation. Since this radius limits the area inside which the target is, we would expect that a better background calculation would be the result of a higher value for the radius parameter, thus reducing the dispersion. As expected, we showed that the dispersion tends to reduce for higher values of this parameter. A radius of 25 was chosen for the same reason as before, to reduce the number of points in the calculation while still remaining optimal.
+
+The figures for the optimization of these two parameters are not shown here, but made available as an attachment.
+
+Furthermore, there remained three parameters to optimize, all belonging to the canny edge detection algorithm: $\sigma$ , the higher threshold (T) and the lower threshold (t).
+
+The $\sigma$ parameter controls the radius of the Gaussian filter applied to the image to begin the algorithm. By observing Fig. \ref{fig:sigma_opt} we can see that the dispersion decreases as sigma increases since by applying a larger Gaussian filter we are smoothing the image even more. We choose a value of 1.85 for the optimal $\sigma$ to balance the minimal dispersion with the computed area of the target - too great of sigma and the algorithm finds the wrong edges and the area greatly increases.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.4\textwidth]{dispersion_sigma.png}
+\caption{Dispersion as a function of $\sigma$ for the canny edge detection.}
+\label{fig:sigma_opt}
+\end{figure}
+
+Using this value of $\sigma$, we optimized T. In Fig. \ref{fig:T_opt} we can see a minimum in the region of 2000 to 4000, with the dispersion greatly increasing for lower and higher values of T. We thus choose T = 3500 by observing the area of the target captured, as for $\sigma$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=.4\textwidth]{dispersion_T.png}
+\caption{Dispersion as a function of T for the canny edge detection.}
+\label{fig:T_opt}
+\end{figure}
+
+Finally, we computed the lower threshold using all the optimal parameters. The canny edge detection algorithm is expected to be more effective for $t = 0.5T$ thus we are expecting to find a minimum of dispersion for this value. We can see that our expections are met, in Fig. \ref{fig:t_opt}. We thus choose t = 0.5T as the optimal parameter.
+
+\begin{figure}
+\centering
+\includegraphics[width=.4\textwidth]{dispersion_t.png}
+\caption{Dispersion as a function of t for the canny edge detection.}
+\label{fig:t_opt}
+\end{figure}
+
+The optimal parameters are presented in Tab. \ref{tab:optimal} for convinience.
+
+\begin{table}[]
+\centering
+\caption{Optimal algorithm parameters.}
+\label{tab:optimal}
+\begin{tabular}{ccccc}
+\begin{tabular}[c]{@{}c@{}}CM\\ Square Side\end{tabular} & \begin{tabular}[c]{@{}c@{}}Background\\ Radius\end{tabular} & $\sigma$ & T    & t    \\
+20                                                       & 25                                                          & 1.85     & 3500 & 0.5T
+\end{tabular}
+\end{table}
 
 \section{Timing Optimization}
 
+Even though no timing optimization was performed for this algorithm, we can see that it behaves quite well for the studied data.
+
+The pipeline takes approximately 3 secs to produce the flux data with less than a second more to export flux, background mean and background average results.
+
+\section{Conclusions}
+
+%   \begin{enumerate}
+%      \item conclusion 1
+%      \item conclusion 2
+%   \end{enumerate}
+
+%\begin{acknowledgements}
+%      Part of this work was supported by the German
+%      \emph{Deut\-sche For\-schungs\-ge\-mein\-schaft, DFG\/} project
+%      number Ts~17/2--1.
+%\end{acknowledgements}
 
 %                                     Two column figure (place early!)
 %______________________________________________ Gamma_1 (lg rho, lg e)
@@ -243,18 +347,6 @@ Parameter & Value & $1\ \sigma$ \ error \\
 %
 %______________________________________________________________
 
-\section{Conclusions}
-
-%   \begin{enumerate}
-%      \item conclusion 1
-%      \item conclusion 2
-%   \end{enumerate}
-
-%\begin{acknowledgements}
-%      Part of this work was supported by the German
-%      \emph{Deut\-sche For\-schungs\-ge\-mein\-schaft, DFG\/} project
-%      number Ts~17/2--1.
-%\end{acknowledgements}
 
 % WARNING
 %-------------------------------------------------------------------
@@ -272,6 +364,9 @@ Parameter & Value & $1\ \sigma$ \ error \\
 
 \bibitem[(Canny 1986)]{canny} Canny, J. 1986,
       in IEEE Transactions on Pattern Analysis and Machine Intelligence
+
+\bibitem[(CHEOPS Status)]{cheops} Benz, W. , 
+      Review of CHEOPS mission and status update
 
 \end{thebibliography}
 

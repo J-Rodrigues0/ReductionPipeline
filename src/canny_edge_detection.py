@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def round_angle(angle):
-    """ Input angle must be \in [0,180) """
+    """ Input angle must be in [0,180) """
     angle = np.rad2deg(angle) % 180
     if (0 <= angle < 22.5) or (157.5 <= angle < 180):
         angle = 0

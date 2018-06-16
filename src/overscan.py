@@ -4,7 +4,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 # Open fits file
-hdulist = fits.open("TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
+hdulist = fits.open("../../TrabalhoComputacional/CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits")
 
 # Overscan:
 overscanleft = hdulist[7].data
@@ -56,6 +56,7 @@ print('One std deviation error of parameters: %s' %perr)
 # Plotting
 
 plt.figure(2)
+plt.grid(color='gray', linestyle='--', linewidth=0.5)
 plt.bar(bins[:-1],hist,align='edge',color='k')
 plt.plot(bin_centres,gauss(bin_centres,*popt),color='r',label='Gaussian fit')
 plt.xlabel('Averages Values')

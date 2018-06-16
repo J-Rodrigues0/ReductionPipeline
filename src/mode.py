@@ -116,6 +116,7 @@ plt.scatter(x,background_mode,color='k',marker='.')
 plt.plot(x,sin(x,*popt),color='r',label='Sinusoidal Fit')
 plt.ylabel('Background Mode')
 plt.xlabel('n')
+plt.grid(color='gray', linestyle='--', linewidth=0.5)
 plt.legend()
 
 
@@ -137,6 +138,7 @@ plt.scatter(x,background_avg,color='k',marker='.')
 plt.plot(x_avg,sin(x_avg,*popt),color='r',label='Sinusoidal Fit')
 plt.ylabel('Background Mean')
 plt.xlabel('n')
+plt.grid(color='gray', linestyle='--', linewidth=0.5)
 plt.legend()
 
 plt.show()

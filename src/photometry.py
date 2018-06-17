@@ -94,7 +94,7 @@ for i in range(nimage):
 
 	N_counts[i] = np.sum(img[target_indx[0] - 100 + R[i][1],target_indx[1] - 100 + R[i][0]])
 
-print(clock()-t0)
+#print(clock()-t0)
 
 Flux = N_counts
 
@@ -114,9 +114,9 @@ plt.figure(3)
 plt.scatter(img_pts,background_avg,color='k',marker='.')
 plt.ylabel('Background Average')
 plt.xlabel('n')
-"""
-#plt.show()
 
+plt.show()
+"""
 """
 # Calculate dispersion
 dispersion = abs((Flux - np.roll(Flux,1))/(np.max(Flux)-np.min(Flux))*100)
@@ -126,11 +126,12 @@ plt.ylabel('Dispersion (%) (% of max(Flux) - min(Flux))')
 plt.xlabel('n')
 """
 # Calculate standard deviation
-
+"""
 N = 60
 std_dev = np.std(Flux[:N])/np.mean(Flux[:N])*100
 
 print('Standard deviation of first %s points is: %s' %(N,round(std_dev,3)) + '%')
+"""
 
 ##### Optimization #####
 """
@@ -400,7 +401,7 @@ plt.ylabel('Dispersion (%)')
 plt.xlabel('Square side used for CM calculation')
 plt.xticks(np.arange(10,80,10))
 
-"""
+
 r_min_vals = np.arange(10,40,2.5)
 dispersion = np.zeros(len(r_min_vals))
 for k in range(len(r_min_vals)):
@@ -470,3 +471,4 @@ plt.xlabel('Radius used for Background calculation')
 plt.xticks(r_min_vals)
 
 plt.show()
+"""

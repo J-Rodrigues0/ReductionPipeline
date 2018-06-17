@@ -142,14 +142,25 @@ def main(**kwargs):
 	return 0
 
 if __name__ == "__main__":
-
+	# Using tkinter to generate user interface
 	tk = Tk()
 	fits_path = askopenfilename(initialdir = os.getcwd(),title = "Select SUBARRAY file")
 	flat_path = askopenfilename(initialdir = os.getcwd(),title = "Select FLATFIELD file")
 
-	out_path = askdirectory(initialdir = os.getcwd(),title = "Select OUTPUT directory")
+	out_path = askdirectory(initialdir = os.getcwd(),title = "Select OUTPUT directory") +'/'
 	clocking = messagebox.askyesno("Clocking","Print clocking information?")
 	tk.destroy()
+
+	# DEFAULT VALUES, USE ONLY IF TKINTER IS NOT WORKING
+	# Assumes SubArray and FlatField files are in the same directory as this program
+	"""
+	fits_path = 'CH_PR100010_TG023201_TU2019-10-06T09-40-30_SCI_RAW_SubArray_V0000.fits'
+	flat_path = 'CH_PR100010_TG023201_TU2019-10-06T09-40-00_SIM_TRU_FlatField_V0000.fits'
+	out_path = ''
+	clocking = True
+
+	print('USING DEFAULT PATHS')
+	"""
 
 	kwargs = {}
 	kwargs['clocking'] = clocking

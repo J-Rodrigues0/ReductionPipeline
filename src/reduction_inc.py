@@ -217,7 +217,7 @@ def treat_data(flux,out_path,**kwargs):
 	plt.ylabel('Flux (Number of Counts)')
 	plt.xlabel('n')
 	plt.legend()
-	plt.savefig(out_path + '/flux.png',dpi=400,bbox_inches='tight')
+	plt.savefig(out_path + 'flux.png',dpi=400,bbox_inches='tight')
 	
 	# Optional background mean and mode plot.
 
@@ -229,7 +229,7 @@ def treat_data(flux,out_path,**kwargs):
 		plt.grid(color='gray', linestyle='--', linewidth=0.5)
 		plt.ylabel('Background Mode')
 		plt.xlabel('n')
-		plt.savefig(out_path + '/bkg_mode.png',dpi=400,bbox_inches='tight')
+		plt.savefig(out_path + 'bkg_mode.png',dpi=400,bbox_inches='tight')
 	except:
 		print("NOT PLOTTING BACKGROUND MODE DATA")
 
@@ -241,7 +241,7 @@ def treat_data(flux,out_path,**kwargs):
 		plt.grid(color='gray', linestyle='--', linewidth=0.5)
 		plt.ylabel('Background Average')
 		plt.xlabel('n')
-		plt.savefig(out_path + '/bkg_mean.png',dpi=400,bbox_inches='tight')
+		plt.savefig(out_path + 'bkg_mean.png',dpi=400,bbox_inches='tight')
 	except:
 		print("NOT PLOTTING BACKGROUND MEAN DATA")
 
@@ -249,6 +249,6 @@ def treat_data(flux,out_path,**kwargs):
 	header += 'FLUX\tBKG_MODE\tBKG_MEAN'
 
 	# Save data
-	np.savetxt(out_path + '/data.txt', kwargs['data'], fmt='%.18e', delimiter='\t', header=header, encoding=None)
+	np.savetxt(out_path + 'data.txt', kwargs['data'], fmt='%.18e', delimiter='\t', header=header, encoding=None)
 
 	print("DATA EXPORTED TO: %s" %out_path)

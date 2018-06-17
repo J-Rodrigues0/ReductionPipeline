@@ -5,7 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def round_angle(angle):
-    """ Input angle must be in [0,180) """
+    """
+	Rounds angles to find neighbours.
+    """
     angle = np.rad2deg(angle) % 180
     if (0 <= angle < 22.5) or (157.5 <= angle < 180):
         angle = 0
@@ -18,9 +20,16 @@ def round_angle(angle):
     return angle
 
 def gs_filter(img, sigma):
+	"""
+	Applies gaussian filter.
+	"""
 	return gaussian_filter(img, sigma)
 
 def grad_intensity(img):
+	"""
+	Computes gradient intensity of the images.
+	"""
+
 	Kx = np.array(
 		[[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], np.int32
 	)
@@ -39,15 +48,12 @@ def grad_intensity(img):
 	return (G, D)
 
 def threshold(img, t, T):
-	""" Step 4: Thresholding
+	""" Thresholding
 	Iterates through image pixels and marks them as WEAK and STRONG edge
 	pixels based on the threshold values.
-	Args:
-	    img: Numpy ndarray of image to be processed (suppressed image)
-	    t: lower threshold
-	    T: upper threshold
-	Return:
-	    img: Thresholdes image
+
+	t: lower threshold
+	T: upper threshold
 	"""
 
 	# define gray value of a WEAK and a STRONG pixel
@@ -73,21 +79,11 @@ def threshold(img, t, T):
 	return (img, cf.get('WEAK'))
 
 def tracking(img, weak, strong=255):
-	""" Step 5:
+	"""
 	Checks if edges marked as weak are connected to strong edges.
-	Note that there are better methods (blob analysis) to do this,
-	but they are more difficult to understand. This just checks neighbour
-	edges.
-	Also note that for perfomance reasons you wouldn't do this kind of tracking
-	in a seperate loop, you would do it in the loop of the tresholding process.
-	Since this is an **educational** implementation ment to generate plots
-	to help people understand the major steps of the Canny Edge algorithm,
-	we exceptionally don't care about perfomance here.
-	Args:
-	img: Numpy ndarray of image to be processed (thresholded image)
+
+	img: image to be processed (thresholded image)
 	weak: Value that was used to mark a weak edge in Step 4
-	Returns:
-	final Canny Edge image.
 	"""
 
 	M, N = img.shape
@@ -107,6 +103,10 @@ def tracking(img, weak, strong=255):
 	return img
 
 def canny_detect(img,R,sigma,t,T,square_size = 50):
+	"""
+	Applies the several steps of the algorithm.
+	"""
+
 	img_square = img[(R[1] - square_size):(R[1] + square_size),(R[0] - square_size):(R[0] + square_size)].copy()
 
 	img_square = gs_filter(img_square,sigma)

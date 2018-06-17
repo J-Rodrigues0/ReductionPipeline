@@ -35,15 +35,15 @@
   \abstract
   % context heading (optional)
   % {} leave it empty if necessary  
-   {}
+   {In this work, a possible reduction pipeline for the CHEOPS mission is presented and characterized.}
   % aims heading (mandatory)
-   {}
+   {We hope to achieve satisfactory results on the computation of the light flux in the target star, by finding a transit and keeping the data dispersion bounded to $\lesssim 20$ ppm for six hours of observation.}
   % methods heading (mandatory)
-   {}
+   {The bias subtraction is done by performing an average over all the points in the four collumns. The images are divided by extra flatfield ones. The centroid estimation is done by computing the center of mass of a square area of side 20 px around the center of the image. Canny edge detection is applied on a square area around the centroid of the target and the target points are thus computed. The background values are estimated by computing the mode and the mean of all points outside a circle of radius 25 px around the centroid of the target. This values are subtracted from the image before computing the flux on the target area.}
   % results heading (mandatory)
-   {}
+   {We observed the expected transit of a planet in front of the target under observation. The dispersion was proved to be < 20 ppm when using only the background mode subtraction and $\sim 20$ ppm when using both the mode and mean subtraction. The pipeline is shown to run in $\sim 3.6$ seconds with a data sample of 406 images, with the production of flux and background estimation graphs.}
   % conclusions heading (optional), leave it empty if necessary 
-   {}
+   {We conclude that this is a viable method to perform the pipeline since it is able to deliver results with the expected dispersion values in a small computation time.}
 
    \keywords{}
 
@@ -52,13 +52,16 @@
 %________________________________________________________________
 
 \section{Introduction}
-%__________________________________________________________________
+
+The reduction pipeline is one of the most important steps in producing science ready data from star observations. This software should be able to take the raw image data captured by the telescope and compute the light flux of the target star as a function of time. From this function, it is then possible to compute physical parameters from the planet or planets transiting in front of the star at the moment of observation e.g. the planet radius, the orbit period, etc.
+
+It is thus critical to perform a well characterized data reduction. In this report we explain the approach taken to achieve this by applying the classical steps of bias subtraction, flatfield division and centroid estimation and by computing the area of the target using the canny edge detection algorithm.
 
 \section{Overscan}
 
 The first step in treating the data is to subtract the overscan values from the image in order to remove the so-called Bias - a systematic error such as electronic noise introduced while reading the CCD .
 
-\begin{figure}[H]
+\begin{figure}
 \centering
 \includegraphics[width=.4\textwidth]{overscan_hist.png}
 \caption{Histogram of averages for each line of the 4 columns.}
@@ -212,7 +215,7 @@ Parameter & Value & $1\ \sigma$ \ error \\
 
 The photometry measurement can then be performed, by subtracting the background mode and, optionally, mean from the images and then sum the values of the points belonging to the target. The results obtained for the flux over time are shown in Fig. \ref{fig:flux}.
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=.4\textwidth]{flux.png}
 \includegraphics[width=.4\textwidth]{flux_no_avg.png}
@@ -306,10 +309,18 @@ The pipeline takes approximately 3 secs to produce the flux data with less than 
 
 \section{Conclusions}
 
-%   \begin{enumerate}
-%      \item conclusion 1
-%      \item conclusion 2
-%   \end{enumerate}
+\begin{enumerate}
+	\item We conclude that the approach used to perform the photometry on the sample images is well behaved.
+	\item Firstly, it is seen that the overscan of the images successfully removes the Bias by performing an average over the four overscan columns and subtracting it from the images.
+	\item Secondly, the target images are divided by the flatfield ones in order to remove bad pixels.
+	\item We then proceeded to finding the target in the image by first computing the center of mass. Instead of calculating it for the whole image, we compute it for a small squared area with a 20 px side, around the center of the image. This center of mass calculation is shown to remain valid across multiple images.
+	\item Afterwards the canny edge detection is performed in a different square area centered on the center of mass of the image and the points belonging to the target are found. This computation is proved to be in accordance with image observations. The parameters used in the algorithm are: $\sigma = 1.85$, $T = 3500$ and $t = 0.5T$.
+	\item Furthermore, the background calculation is done by computing the mode and the mean of the image area outside 25 px radius centered on the center of mass. This value is then subtracted from the image in order to perform a valid photometry measurement. It is shown that the mode subtraction is effective at removing the background in most images and the mean subtraction should be used to remove the effect of the South Atlantic Anomaly.
+	\item The photometry is then calculated on the are of the target. This computation is found to be in accordance with the expected values since a clear transit is present in the flux graph. Furthermore, the dispersion is found to be $< 20$ ppm when using only the mode in the background subtraction and $\sim 20$ ppm when also using the background mean. This results are what is expected from the CHEOPS satellite.
+	\item Finally, all the parameters in the pipeline are optimized to reduce the aforementioned dispersion and found to behave as expected.
+	\item This pipeline is shown to take $\sim 3.6$ seconds to compute and deliver the results for a data sample of 406 images (corresponding to 406 minutes of observation).
+	\item Future work should be done by adding a transit analysis to the pipeline to compute e.g. the planet radius and the planet transit period. 
+\end{enumerate}
 
 %\begin{acknowledgements}
 %      Part of this work was supported by the German

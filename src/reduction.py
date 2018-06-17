@@ -169,6 +169,3 @@ if __name__ == "__main__":
 	kwargs['out_path'] = out_path
 
 	main(**kwargs)
-
-
-

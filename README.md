@@ -25,7 +25,7 @@ data to the output path selected by the user.
 
 ## Final notes
 
-If the user wishes too, it is possible to comment lines 146-152 and
+If the user wishes to, it is possible to comment lines 146-152 and
 uncomment lines 157-162 in order to disregard the tkinter user interface
 and use the default values for the variables. This assumes the SubArray
 and FlatField files are in the same directory and have the names in the
